@@ -27,6 +27,10 @@ PRODUCT_PRODUCT_PROPERTIES += \
 endif
 endif
 
+# Cloned app exemption
+PRODUCT_COPY_FILES += \
+    vendor/afterlife/prebuilt/common/etc/sysconfig/preinstalled-packages-platform-afterlife-product.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/preinstalled-packages-platform-afterlife-product.xml
+
 ifeq ($(TARGET_BUILD_VARIANT),eng)
 # Disable ADB authentication
 PRODUCT_SYSTEM_EXT_PROPERTIES += ro.adb.secure=0
