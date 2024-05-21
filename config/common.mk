@@ -53,7 +53,11 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
 endif
 endif
 
-# afterlife-specific init rc file
+# BtHelper
+PRODUCT_PACKAGES += \
+    BtHelper
+
+# Afterlife-specific init rc file
 PRODUCT_COPY_FILES += \
     vendor/afterlife/prebuilt/common/etc/init/init.afterlife-system_ext.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.afterlife-system_ext.rc
 
