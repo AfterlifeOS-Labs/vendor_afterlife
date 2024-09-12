@@ -35,3 +35,14 @@ AFTERLIFE_DISPLAY_VERSION := $(PRODUCT_VERSION_MAJOR)-$(AFTERLIFE_VERSION_SUFFIX
 
 # Codename version
 AFTERLIFE_DISPLAY_VERSION_CODENAME := 15.1 | $(AFTERLIFE_CODENAME)
+
+
+
+# AfterlifeOS System Version
+ADDITIONAL_SYSTEM_PROPERTIES += \
+    ro.afterlife.build.version=$(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR) \
+    ro.afterlife.display.version=$(AFTERLIFE_DISPLAY_VERSION_CODENAME) \
+    ro.afterlife.releasetype=$(AFTERLIFE_BUILDTYPE) \
+    ro.afterlife.version=$(AFTERLIFE_VERSION) \
+    ro.afterlife.version.codename=$(AFTERLIFE_CODENAME) \
+    ro.afterlife.version.extra=$(AFTERLIFE_VERSION_EXTRA)

@@ -16,6 +16,10 @@ PRODUCT_PACKAGES += \
     NavigationBarNoHint \
     NavigationBarMode2ButtonOverlay
 
+# Website
+PRODUCT_SYSTEM_PROPERTIES += \
+    ro.afterlife.url=https://afterlifeos.com
+
 # Media
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     media.recorder.show_manufacturer_and_model=true
