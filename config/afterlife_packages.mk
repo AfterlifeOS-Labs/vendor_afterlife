@@ -1,6 +1,6 @@
 # AfterEcho
 ifeq ($(TARGET_USE_ECHO),true)
-    $(call inherit-product-if-exists, vendor/dolby/afterlife/afterlife.mk)
+    $(call inherit-product, vendor/dolby/afterlife/echo.mk)
 endif
 
 # BtHelper
