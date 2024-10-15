@@ -58,6 +58,7 @@ function goafterlife()
     target=$1
     local variant="userdebug"
     local clean_build="true"
+    local upload_zip="false"
 
     if [ $# -eq 0 ]; then
         # No arguments, so let's have the full menu
@@ -71,6 +72,10 @@ function goafterlife()
                 case "${1}" in
                     --dirty)
                         clean_build="false"
+                        shift
+                        ;;
+                    --release)
+                        upload_zip="true"
                         shift
                         ;;
                     user)
@@ -106,7 +111,21 @@ function goafterlife()
     fi
     m afterlife -j$(nproc --all)
 
+    if [ "upload_zip" = "true" ]; then
+        gorelease $target
+    fi
+
     return $?
+}
+
+function gorelease()
+{
+    target=$1
+    local pdapi=":351bd0a4-8613-442f-8b49-088fed764ce4"
+
+    if [ -f out/target/product/$target/AfterLife*.zip ]; then
+        curl -T out/target/product/$target/AfterLife*.zip -u $dpapi https://pixeldrain.com/api/file/
+    fi
 }
 
 function breakfast()
