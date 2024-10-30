@@ -9,6 +9,7 @@ PRODUCT_PACKAGES += \
 
 # Afterlife packages
 PRODUCT_PACKAGES += \
+    AvatarPicker \
     Eleven \
     Etar \
     ExactCalculator \
