@@ -35,7 +35,6 @@ SOONG_CONFIG_afterlifeGlobalVars += \
     gralloc_handle_has_custom_content_md_reserved_size \
     gralloc_handle_has_reserved_size \
     gralloc_handle_has_ubwcp_format \
-    target_health_charging_control_charging_path \
     target_health_charging_control_charging_enabled \
     target_health_charging_control_charging_disabled \
     target_health_charging_control_deadline_path \
@@ -56,6 +55,11 @@ SOONG_CONFIG_afterlifeGlobalVars += \
 SOONG_CONFIG_NAMESPACES += afterlifeNvidiaVars
 SOONG_CONFIG_afterlifeNvidiaVars += \
     uses_nvidia_enhancements
+
+ifneq ($(TARGET_HEALTH_CHARGING_CONTROL_CHARGING_PATH),)
+SOONG_CONFIG_afterlifeGlobalVars += \
+    target_health_charging_control_charging_path
+endif
 
 SOONG_CONFIG_NAMESPACES += afterlifeQcomVars
 SOONG_CONFIG_afterlifeQcomVars += \
@@ -125,6 +129,11 @@ SOONG_CONFIG_afterlifeGlobalVars_target_surfaceflinger_udfps_lib := $(TARGET_SUR
 SOONG_CONFIG_afterlifeGlobalVars_target_trust_usb_control_path := $(TARGET_TRUST_USB_CONTROL_PATH)
 SOONG_CONFIG_afterlifeGlobalVars_target_trust_usb_control_enable := $(TARGET_TRUST_USB_CONTROL_ENABLE)
 SOONG_CONFIG_afterlifeGlobalVars_target_trust_usb_control_disable := $(TARGET_TRUST_USB_CONTROL_DISABLE)
+
+ifneq ($(TARGET_HEALTH_CHARGING_CONTROL_CHARGING_PATH),)
+SOONG_CONFIG_afterlifeGlobalVars_target_health_charging_control_charging_path := $(TARGET_HEALTH_CHARGING_CONTROL_CHARGING_PATH)
+endif
+
 ifneq ($(filter $(QSSI_SUPPORTED_PLATFORMS),$(TARGET_BOARD_PLATFORM)),)
 SOONG_CONFIG_afterlifeQcomVars_qcom_display_headers_namespace := vendor/qcom/opensource/commonsys-intf/display
 else
