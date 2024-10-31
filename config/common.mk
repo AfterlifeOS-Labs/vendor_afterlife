@@ -71,6 +71,10 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     frameworks/base/data/keyboards/Vendor_045e_Product_028e.kl:$(TARGET_COPY_OUT_PRODUCT)/usr/keylayout/Vendor_045e_Product_0719.kl
 
+# Component overrides
+PRODUCT_PACKAGES += \
+    afterlife-component-overrides.xml
+
 # This is Afterlife!
 PRODUCT_COPY_FILES += \
     vendor/afterlife/config/permissions/com.afterlifeos.android.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/com.afterlifeos.android.xml
