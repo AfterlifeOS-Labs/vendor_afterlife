@@ -10,14 +10,14 @@ PRODUCT_PACKAGES += \
 # Afterlife packages
 PRODUCT_PACKAGES += \
     AvatarPicker \
-    Eleven \
     Etar \
     ExactCalculator \
     Glimpse \
     Jelly \
     LatinIME \
     Profiles \
-    Recorder
+    Recorder \
+    Twelve
 
 ifeq ($(PRODUCT_TYPE), go)
 PRODUCT_PACKAGES += \
