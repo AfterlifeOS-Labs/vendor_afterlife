@@ -1,5 +1,5 @@
 # Copyright (C) 2017 Unlegacy-Android
-# Copyright (C) 2023 The AfterLife Project
+# Copyright (C) 2023 The AfterlifeOS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,21 +14,22 @@
 # limitations under the License.
 
 # -----------------------------------------------------------------
-# AfterLife OTA update package
+# Afterlife OTA update package
 
-AFTERLIFE_ZIP_NAME := afterlife_$(TARGET_DEVICE)-$(shell echo $(AFTERLIFE_VERSION) | tr '[:upper:]' '[:lower:]').zip
-AFTERLIFE_TARGET_PACKAGE := $(PRODUCT_OUT)/$(AFTERLIFE_ZIP_NAME)
+AFTERLIFE_ZIPNAME := afterlife_$(TARGET_DEVICE)-$(shell echo $(AFTERLIFE_VERSION) | tr '[:upper:]' '[:lower:]').zip
+AFTERLIFE_TARGET_PACKAGE := $(PRODUCT_OUT)/$(AFTERLIFE_ZIPNAME)
 
 SHA256 := prebuilts/build-tools/path/$(HOST_PREBUILT_TAG)/sha256sum
 
-.PHONY: afterlife
-afterlife: $(DEFAULT_GOAL) $(INTERNAL_OTA_PACKAGE_TARGET)
-	$(hide) mv $(INTERNAL_OTA_PACKAGE_TARGET) $(AFTERLIFE_TARGET_PACKAGE)
+$(AFTERLIFE_TARGET_PACKAGE): $(INTERNAL_OTA_PACKAGE_TARGET)
+	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(AFTERLIFE_TARGET_PACKAGE)
 	$(hide) $(SHA256) $(AFTERLIFE_TARGET_PACKAGE) | sed "s|$(PRODUCT_OUT)/||" > $(AFTERLIFE_TARGET_PACKAGE).sha256sum
-	$(hide) ./vendor/afterlife/tools/generate_json_build_info.sh $(TARGET_DEVICE) $(PRODUCT_OUT) $(AFTERLIFE_ZIP_NAME)
 	@echo "Done"
 	@echo -e "\t ===============================-Package complete-========================================="
-	@echo -e "\t Zip: $(AFTERLIFE_TARGET_PACKAGE)"
+	@echo -e "\t Filename: $(AFTERLIFE_TARGET_PACKAGE)"
 	@echo -e "\t Size: `du -sh $(AFTERLIFE_TARGET_PACKAGE) | awk '{print $$1}' `"
-	@echo -e "\t AfterLife | #NeverDie"
+	@echo -e "\t AfterlifeOS | #NeverDie"
 	@echo -e "\t =========================================================================================="
+
+.PHONY: afterlife
+afterlife: $(AFTERLIFE_TARGET_PACKAGE) $(DEFAULT_GOAL)

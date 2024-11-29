@@ -1,7 +1,4 @@
-# Allow vendor/extra to override any property by setting it first
-$(call inherit-product-if-exists, vendor/extra/product.mk)
-
-PRODUCT_BRAND ?= AfterLife
+PRODUCT_BRAND ?= AfterlifeOS
 
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
 
@@ -13,9 +10,26 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.com.google.clientidbase=$(PRODUCT_GMS_CLIENTID_BASE)
 endif
 
+ifeq ($(PRODUCT_IS_ATV),true)
+ifeq ($(PRODUCT_ATV_CLIENTID_BASE),)
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+    ro.oem.key1=ATV00100020
+else
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+    ro.oem.key1=$(PRODUCT_ATV_CLIENTID_BASE)
+endif
+endif
+
+ifeq ($(TARGET_BUILD_VARIANT),eng)
 # Disable ADB authentication
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.adb.secure=0
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.usb.config=adb
+else
+# Enable ADB authentication
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.adb.secure=1
+
+# Disable extra StrictMode features on all non-engineering builds
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.strictmode.disable=true
+endif
 
 # Backup Tool
 PRODUCT_COPY_FILES += \
@@ -43,74 +57,29 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
 endif
 endif
 
-# Blurs
-ifeq ($(TARGET_SUPPORTS_BLUR),true)
-PRODUCT_SYSTEM_EXT_PROPERTIES += \
-    ro.sf.blurs_are_expensive=1 \
-    ro.surface_flinger.supports_background_blur=1 \
-    ro.launcher.blur.appLaunch=0 \
-    persist.sys.sf.disable_blurs=1
-endif
-
-# Some permissions
+# Afterlife-specific broadcast actions whitelist
 PRODUCT_COPY_FILES += \
-    vendor/afterlife/config/permissions/privapp-permissions-lineagehw.xml:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/permissions/privapp-permissions-lineagehw.xml
+    vendor/afterlife/config/permissions/afterlife-sysconfig.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/afterlife-sysconfig.xml
 
-# AfterLife-specific init rc file
+# Afterlife-specific init rc file
 PRODUCT_COPY_FILES += \
     vendor/afterlife/prebuilt/common/etc/init/init.afterlife-system_ext.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.afterlife-system_ext.rc
-
-# App lock permission
-PRODUCT_COPY_FILES += \
-    vendor/afterlife/config/permissions/privapp-permissions-settings.xml:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/permissions/privapp-permissions-settings.xml
-
-# Enable Android Beam on all targets
-PRODUCT_COPY_FILES += \
-    vendor/afterlife/config/permissions/android.software.nfc.beam.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/android.software.nfc.beam.xml
-
-# Display
-PRODUCT_SYSTEM_EXT_PROPERTIES += \
-    debug.sf.frame_rate_multiple_threshold=60 \
-    ro.surface_flinger.enable_frame_rate_override=false
 
 # Enable SIP+VoIP on all targets
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.sip.voip.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/android.software.sip.voip.xml
 
-# Enable SystemUIDialog volume panel
-PRODUCT_SYSTEM_EXT_PROPERTIES += \
-    sys.fflag.override.settings_volume_panel_in_systemui=true
-
 # Enable wireless Xbox 360 controller support
 PRODUCT_COPY_FILES += \
     frameworks/base/data/keyboards/Vendor_045e_Product_028e.kl:$(TARGET_COPY_OUT_PRODUCT)/usr/keylayout/Vendor_045e_Product_0719.kl
 
-# Face Unlock
-TARGET_FACE_UNLOCK_SUPPORTED ?= $(TARGET_SUPPORTS_64_BIT_APPS)
+# This is Afterlife!
+PRODUCT_COPY_FILES += \
+    vendor/afterlife/config/permissions/com.afterlifeos.android.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/com.afterlifeos.android.xml
 
 # Enforce privapp-permissions whitelist
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
-    ro.control_privapp_permissions=log
-
-# Gboard side padding
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.com.google.ime.kb_pad_port_l=4 \
-    ro.com.google.ime.kb_pad_port_r=4 \
-    ro.com.google.ime.kb_pad_land_l=64 \
-    ro.com.google.ime.kb_pad_land_r=64
-
-# Google Photos Pixel Exclusive XML
-PRODUCT_COPY_FILES += \
-    vendor/afterlife/prebuilt/common/etc/sysconfig/pixel_2016_exclusive.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/pixel_2016_exclusive.xml
-
-# Lineage Hardware
-PRODUCT_COPY_FILES += \
-    vendor/afterlife/config/permissions/privapp-permissions-lineagehw.xml:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/permissions/privapp-permissions-lineagehw.xml \
-    vendor/afterlife/config/permissions/org.lineageos.health.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/org.lineageos.health.xml
-
-# Overlay
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.boot.vendor.overlay.theme=com.android.internal.systemui.navbar.gestural;com.google.android.systemui.gxoverlay
+    ro.control_privapp_permissions=enforce
 
 # Do not include art debug targets
 PRODUCT_ART_TARGET_INCLUDE_DEBUG_BUILD := false
@@ -120,24 +89,14 @@ PRODUCT_ART_TARGET_INCLUDE_DEBUG_BUILD := false
 # leave less information available via JDWP.
 PRODUCT_MINIMIZE_JAVA_DEBUG_INFO := true
 
-# Enable whole-program R8 Java optimizations for SystemUI and system_server,
-# but also allow explicit overriding for testing and development.
-SYSTEM_OPTIMIZE_JAVA ?= true
-SYSTEMUI_OPTIMIZE_JAVA ?= true
-
 # Disable vendor restrictions
 PRODUCT_RESTRICT_VENDOR_FILES := false
 
-ifneq ($(TARGET_DISABLE_EPPE),true)
-# Require all requested packages to exist
-$(call enforce-product-packages-exist-internal,$(wildcard device/*/$(AFTERLIFEBUILD)/$(TARGET_PRODUCT).mk),product_manifest.xml rild Calendar Launcher3 Launcher3Go Launcher3QuickStep Launcher3QuickStepGo android.hidl.memory@1.0-impl.vendor vndk_apex_snapshot_package)
-endif
-
-# Call Recording
-ifneq ($(TARGET_CALL_RECORDING_SUPPORTED),false)
-PRODUCT_COPY_FILES += \
-    vendor/afterlife/config/permissions/com.google.android.apps.dialer.call_recording_audio.features.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/com.google.android.apps.dialer.call_recording_audio.features.xml
-endif
+# Bootanimation
+TARGET_SCREEN_WIDTH ?= 1080
+TARGET_SCREEN_HEIGHT ?= 1920
+PRODUCT_PACKAGES += \
+    bootanimation.zip
 
 PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST += \
     system/bin/curl \
@@ -147,7 +106,6 @@ PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST += \
 # Filesystems tools
 PRODUCT_PACKAGES += \
     fsck.ntfs \
-    mke2fs \
     mkfs.ntfs \
     mount.ntfs
 
@@ -157,23 +115,6 @@ PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST += \
     system/bin/mount.ntfs \
     system/%/libfuse-lite.so \
     system/%/libntfs-3g.so
-
-# Openssh
-PRODUCT_PACKAGES += \
-    scp \
-    sftp \
-    ssh \
-    sshd \
-    sshd_config \
-    ssh-keygen \
-    start-ssh
-
-PRODUCT_COPY_FILES += \
-    vendor/afterlife/prebuilt/common/etc/init/init.openssh.rc:$(TARGET_COPY_OUT_PRODUCT)/etc/init/init.openssh.rc
-
-# rsync
-PRODUCT_PACKAGES += \
-    rsync
 
 # Storage manager
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
@@ -188,57 +129,33 @@ PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST += \
     system/bin/procmem
 endif
 
-# One Handed mode
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+    dalvik.vm.systemuicompilerfilter=speed
+
+# SetupWizard
 PRODUCT_PRODUCT_PROPERTIES += \
-    ro.support_one_handed_mode=true
+    setupwizard.theme=glif_v4 \
+    setupwizard.feature.day_night_mode_enabled=true
 
-# Disable remote keyguard animation
-PRODUCT_SYSTEM_PROPERTIES += \
-    persist.wm.enable_remote_keyguard_animation=0
-
-# Clean up packages cache to avoid wrong strings and resources
-PRODUCT_COPY_FILES += \
-    vendor/afterlife/prebuilt/common/bin/clean_cache.sh:system/bin/clean_cache.sh
-
-# Pixel customization
-TARGET_SUPPORTS_GOOGLE_BATTERY ?= false
-
-# SystemUI
-PRODUCT_DEXPREOPT_SPEED_APPS += \
-    NexusLauncherRelease \
-    Settings \
-    SystemUI
-
-# Speed profile services and wifi-service to reduce RAM and storage
-PRODUCT_SYSTEM_SERVER_COMPILER_FILTER := speed-profile
-PRODUCT_USE_PROFILE_FOR_BOOT_IMAGE := true
-PRODUCT_DEX_PREOPT_BOOT_IMAGE_PROFILE_LOCATION := frameworks/base/config/boot-image-profile.txt
-
+PRODUCT_ENFORCE_RRO_EXCLUDED_OVERLAYS += vendor/afterlife-ui/overlay/no-rro
 PRODUCT_PACKAGE_OVERLAYS += \
-    vendor/afterlife-ui/overlay/common
+    vendor/afterlife/overlay-ui/common \
+    vendor/afterlife/overlay-ui/no-rro
+
+# Translations
+CUSTOM_LOCALES += \
+    ast_ES \
+    gd_GB \
+    cy_GB \
+    fur_IT
 
 PRODUCT_EXTRA_RECOVERY_KEYS += \
     vendor/afterlife/build/target/product/security/afterlife
 
-# Audio
-include vendor/afterlife/config/afterlife_audio.mk
-
-# Bootanimation
-include vendor/afterlife/config/afterlife_bootanimation.mk
-
-# Packages
-include vendor/afterlife/config/afterlife_packages.mk
-
-# Pixel Props
-include vendor/afterlife/config/pixel_props.mk
-
-# Signed
+include vendor/afterlife/config/afterlife_version.mk
 include vendor/afterlife/config/afterlife_signed.mk
-
-# Overlays Themes
-include packages/overlays/Themes/themes.mk
-
-# Versioning
-include vendor/afterlife/config/version.mk
-
--include vendor/after-priv/keys/keys.mk
+include vendor/afterlife/config/afterlife_bootanimation.mk
+include vendor/afterlife/config/afterlife_packages.mk
+include vendor/afterlife/config/afterlife_audio.mk
+-include vendor/afterlife-priv/keys/keys.mk
+-include $(WORKSPACE)/build_env/image-auto-bits.mk

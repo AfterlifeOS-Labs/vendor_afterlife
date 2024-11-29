@@ -1,4 +1,4 @@
-// AfterLife soong configs
+// AfterlifeOS soong configs
 
 bootstrap_go_package {
     name: "soong-afterlife-generator",
@@ -128,23 +128,6 @@ gralloc_handle_custom_content_md_reserved_size {
     soong_config_variables: {
         gralloc_handle_has_custom_content_md_reserved_size: {
             export_cflags: ["-DGRALLOC_HANDLE_HAS_CUSTOM_CONTENT_MD_RESERVED_SIZE"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "sdmcore_has_is_display_hw_available",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["sdmcore_has_is_display_hw_available_func"],
-    properties: ["cflags"],
-}
-
-sdmcore_has_is_display_hw_available {
-    name: "sdmcore_has_is_display_hw_available_func_defaults",
-    soong_config_variables: {
-        sdmcore_has_is_display_hw_available_func: {
-            cflags: ["-DSDMCORE_HAS_IS_DISPLAY_HW_AVAILABLE_FUNC"],
         },
     },
 }
@@ -367,6 +350,33 @@ health_charging_control {
     },
 }
 
+soong_config_module_type {
+    name: "powershare",
+    module_type: "cc_defaults",
+    config_namespace: "afterlifeGlobalVars",
+    value_variables: [
+        "target_powershare_path",
+        "target_powershare_enabled",
+        "target_powershare_disabled",
+    ],
+    properties: ["cppflags"],
+}
+
+powershare {
+    name: "powershare_defaults",
+    soong_config_variables: {
+        target_powershare_path: {
+            cppflags: ["-DPOWERSHARE_PATH=\"%s\""],
+        },
+        target_powershare_enabled: {
+            cppflags: ["-DPOWERSHARE_ENABLED=\"%s\""],
+        },
+        target_powershare_disabled: {
+            cppflags: ["-DPOWERSHARE_DISABLED=\"%s\""],
+        },
+    },
+}
+
 // NVIDIA specific config modules
 soong_config_module_type {
     name: "nvidia_enhancements",
@@ -381,40 +391,6 @@ nvidia_enhancements {
     soong_config_variables: {
         uses_nvidia_enhancements: {
             cppflags: ["-DNV_ANDROID_FRAMEWORK_ENHANCEMENTS"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "disable_bluetooth_le_read_buffer_size_v2",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["disable_bluetooth_le_read_buffer_size_v2"],
-    properties: ["cppflags"],
-}
-
-disable_bluetooth_le_read_buffer_size_v2 {
-    name: "disable_bluetooth_le_read_buffer_size_v2_defaults",
-    soong_config_variables: {
-        disable_bluetooth_le_read_buffer_size_v2: {
-            cppflags: ["-DDISABLE_LE_READ_BUFFER_SIZE_V2"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "disable_bluetooth_le_set_host_feature",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["disable_bluetooth_le_set_host_feature"],
-    properties: ["cppflags"],
-}
-
-disable_bluetooth_le_set_host_feature {
-    name: "disable_bluetooth_le_set_host_feature_defaults",
-    soong_config_variables: {
-        disable_bluetooth_le_set_host_feature: {
-            cppflags: ["-DDISABLE_LE_SET_HOST_FEATURE"],
         },
     },
 }
@@ -495,232 +471,6 @@ qti_vibrator_hal {
         },
         qti_vibrator_effect_lib: {
             shared_libs: ["%s"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "uses_legacy_fd_fbdev",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["uses_legacy_fd_fbdev"],
-    properties: ["cppflags"],
-}
-
-uses_legacy_fd_fbdev {
-    name: "uses_legacy_fd_fbdev_defaults",
-    soong_config_variables: {
-        uses_legacy_fd_fbdev: {
-            cppflags: ["-DUSES_LEGACY_FD_FBDEV"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "uses_oplus_camera",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["uses_oplus_camera"],
-    properties: ["cppflags"],
-}
-uses_oplus_camera {
-    name: "uses_oplus_camera_defaults",
-    soong_config_variables: {
-        uses_oplus_camera: {
-            cppflags: ["-DUSES_OPLUS_CAMERA"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "inputdispatcher_skip_event_key",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    value_variables: ["target_inputdispatcher_skip_event_key"],
-    properties: ["cppflags"],
-}
-
-inputdispatcher_skip_event_key {
-    name: "inputdispatcher_skip_event_key_defaults",
-    soong_config_variables: {
-        target_inputdispatcher_skip_event_key: {
-            cppflags: ["-DINPUTDISPATCHER_SKIP_EVENT_KEY=%s"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "camera_needs_client_info_lib",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["camera_needs_client_info_lib"],
-    properties: [
-        "cppflags",
-        "shared_libs",
-    ],
-}
-
-camera_needs_client_info_lib {
-    name: "camera_needs_client_info_lib_defaults",
-    soong_config_variables: {
-        camera_needs_client_info_lib: {
-            cppflags: ["-DCAMERA_NEEDS_CLIENT_INFO_LIB"],
-            shared_libs: ["//hardware/oneplus:vendor.oneplus.hardware.camera@1.0"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "needs_camera_boottime",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["needs_camera_boottime"],
-    properties: ["cppflags"],
-}
-
-needs_camera_boottime {
-    name: "needs_camera_boottime_defaults",
-    soong_config_variables: {
-        needs_camera_boottime: {
-            cppflags: ["-DTARGET_CAMERA_BOOTTIME_TIMESTAMP"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "target_camera_package_name",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    value_variables: ["target_camera_package_name"],
-    properties: ["cppflags"],
-}
-
-target_camera_package_name {
-    name: "camera_package_name_defaults",
-    soong_config_variables: {
-        target_camera_package_name: {
-            cppflags: ["-DCAMERA_PACKAGE_NAME=\"%s\""],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "camera_needs_client_info",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["camera_needs_client_info"],
-    properties: ["cppflags"],
-}
-
-camera_needs_client_info {
-    name: "camera_needs_client_info_defaults",
-    soong_config_variables: {
-        camera_needs_client_info: {
-            cppflags: ["-DCAMERA_NEEDS_CLIENT_INFO"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "uses_nothing_camera",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["uses_nothing_camera"],
-    properties: ["cppflags"],
-}
-
-uses_nothing_camera {
-    name: "uses_nothing_camera_defaults",
-    soong_config_variables: {
-        uses_nothing_camera: {
-            cppflags: ["-DUSES_NOTHING_CAMERA"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "camera_needs_client_info_lib_oplus",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["camera_needs_client_info_lib_oplus"],
-    properties: [
-        "cppflags",
-        "shared_libs",
-    ],
-}
-
-camera_needs_client_info_lib_oplus {
-    name: "camera_needs_client_info_lib_oplus_defaults",
-    soong_config_variables: {
-        camera_needs_client_info_lib_oplus: {
-            cppflags: ["-DCAMERA_NEEDS_CLIENT_INFO_LIB_OPLUS"],
-            shared_libs: ["vendor.oplus.hardware.cameraMDM@2.0"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "uses_miui_camera",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["uses_miui_camera"],
-    properties: ["cppflags"]
-}
-
-uses_miui_camera {
-    name: "uses_miui_camera_defaults",
-    soong_config_variables: {
-        uses_miui_camera: {
-            cppflags: ["-DUSES_MIUI_CAMERA"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "uses_oppo_camera",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["uses_oppo_camera"],
-    properties: ["cppflags"],
-}
-
-uses_oppo_camera {
-    name: "uses_oppo_camera_defaults",
-    soong_config_variables: {
-        uses_oppo_camera: {
-            cppflags: ["-DUSES_OPPO_CAMERA"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "include_miui_camera",
-    module_type: "cc_defaults",
-    config_namespace: "afterlifeGlobalVars",
-    bool_variables: ["include_miui_camera"],
-    properties: ["cppflags"],
-}
-include_miui_camera {
-    name: "includes_miui_camera",
-    soong_config_variables: {
-        include_miui_camera: {
-            cppflags: ["-DINCLUDES_MIUI_CAMERA"],
-        },
-    },
-}
-
-soong_config_module_type {
-    name: "qcom_libfmjni",
-    module_type: "cc_defaults",
-    config_namespace: "lineageQcomVars",
-    bool_variables: ["no_fm_firmware"],
-    properties: ["cflags"],
-}
-qcom_libfmjni {
-    name: "qcom_libfmjni_defaults",
-    soong_config_variables: {
-        no_fm_firmware: {
-            cflags: ["-DQCOM_NO_FM_FIRMWARE"],
         },
     },
 }

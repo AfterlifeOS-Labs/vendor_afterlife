@@ -23,3 +23,9 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/alarms/frenzy.ogg:$(TARGET_COPY_OUT_PRODUCT)/media/audio/alarms/frenzy.ogg \
     $(LOCAL_PATH)/notifications/Casper.ogg:$(TARGET_COPY_OUT_PRODUCT)/media/audio/notifications/Casper.ogg \
     $(LOCAL_PATH)/ringtones/Cartel.ogg:$(TARGET_COPY_OUT_PRODUCT)/media/audio/ringtones/Cartel.ogg
+
+# Sounds (default)
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.config.ringtone=Cartel.ogg \
+    ro.config.notification_sound=no-pro.ogg \
+    ro.config.alarm_alert=frenzy.ogg

@@ -1,6 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (C) 2012-2013, The CyanogenMod Project
-# Copyright (C) 2023, The AfterLife Project
+#           (C) 2017-2018,2020-2021, The LineageOS Project
+#           (C) 2023 The AfterlifeOS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,22 +24,15 @@ import netrc
 import os
 import re
 import sys
-try:
-  # For python3
-  import urllib.error
-  import urllib.parse
-  import urllib.request
-except ImportError:
-  # For python2
-  import imp
-  import urllib2
-  import urlparse
-  urllib = imp.new_module('urllib')
-  urllib.error = urllib2
-  urllib.parse = urlparse
-  urllib.request = urllib2
+import urllib.error
+import urllib.parse
+import urllib.request
 
 from xml.etree import ElementTree
+
+dryrun = os.getenv('ROOMSERVICE_DRYRUN') == "true"
+if dryrun:
+    print("Dry run roomservice, no change will be made.")
 
 product = sys.argv[1]
 
@@ -53,7 +47,7 @@ except:
     device = product
 
 if not depsonly:
-    print("Device %s not found. Attempting to retrieve device repository from AfterLife-Devices Github (http://github.com/AfterLife-Devices)." % device)
+    print("Device %s not found. Attempting to retrieve device repository from AfterlifeOS Github (http://github.com/AfterlifeOS)." % device)
 
 repositories = []
 
@@ -73,9 +67,9 @@ def add_auth(githubreq):
         githubreq.add_header("Authorization","Basic %s" % githubauth)
 
 if not depsonly:
-    githubreq = urllib.request.Request("https://raw.githubusercontent.com/AfterLife-Devices/mirror/main/default.xml")
+    githubreq = urllib.request.Request("https://raw.githubusercontent.com/AfterlifeOS/mirror/main/default.xml")
     try:
-        result = ElementTree.fromstring(urllib.request.urlopen(githubreq).read().decode())
+        result = ElementTree.fromstring(urllib.request.urlopen(githubreq, timeout=10).read().decode())
     except urllib.error.URLError:
         print("Failed to fetch data from GitHub")
         sys.exit(1)
@@ -166,9 +160,9 @@ def is_in_manifest(projectpath):
         if localpath.get("path") == projectpath:
             return True
 
-    # ... and don't forget the lineage snippet
+    # ... and don't forget the afterlife snippet
     try:
-        lm = ElementTree.parse(".repo/manifests/snippets/lineage.xml")
+        lm = ElementTree.parse(".repo/manifests/snippets/afterlife.xml")
         lm = lm.getroot()
     except:
         lm = ElementTree.Element("manifest")
@@ -180,6 +174,9 @@ def is_in_manifest(projectpath):
     return False
 
 def add_to_manifest(repositories):
+    if dryrun:
+        return
+
     try:
         lm = ElementTree.parse(".repo/local_manifests/roomservice.xml")
         lm = lm.getroot()
@@ -192,15 +189,23 @@ def add_to_manifest(repositories):
         repo_revision = repository['branch']
         print('Checking if %s is fetched from %s' % (repo_target, repo_name))
         if is_in_manifest(repo_target):
-            print('AfterLife-Devices/%s already fetched to %s' % (repo_name, repo_target))
+            print('AfterlifeOS/%s already fetched to %s' % (repo_name, repo_target))
             continue
 
-        print('Adding dependency: AfterLife-Devices/%s -> %s' % (repo_name, repo_target))
         project = ElementTree.Element("project", attrib = {
             "path": repo_target,
             "remote": "github",
-            "name": "AfterLife-Devices/%s" % repo_name,
+            "name": "AfterlifeOS/%s" % repo_name,
             "revision": repo_revision })
+        if repo_remote := repository.get("remote", None):
+            # aosp- remotes are only used for kernel prebuilts, thus they
+            # don't let you customize clone-depth/revision.
+            if repo_remote.startswith("aosp-"):
+                project.attrib["name"] = repo_name
+                project.attrib["remote"] = repo_remote
+                project.attrib["clone-depth"] = "1"
+                del project.attrib["revision"]
+        print("Adding dependency: %s -> %s" % (project.attrib["name"], project.attrib["path"]))
         lm.append(project)
 
     indent(lm, 0)
@@ -227,7 +232,10 @@ def fetch_dependencies(repo_path):
                 fetch_list.append(dependency)
                 syncable_repos.append(dependency['target_path'])
                 if 'branch' not in dependency:
-                    dependency['branch'] = get_default_or_fallback_revision(dependency['repository'])
+                    if dependency.get('remote', 'github') == 'github':
+                        dependency['branch'] = get_default_or_fallback_revision(dependency['repository'])
+                    else:
+                        dependency['branch'] = None
             verify_repos.append(dependency['target_path'])
 
             if not os.path.isdir(dependency['target_path']):
@@ -243,7 +251,8 @@ def fetch_dependencies(repo_path):
 
     if len(syncable_repos) > 0:
         print('Syncing dependencies')
-        os.system('repo sync --force-sync %s' % ' '.join(syncable_repos))
+        if not dryrun:
+            os.system('repo sync --force-sync %s' % ' '.join(syncable_repos))
 
     for deprepo in verify_repos:
         fetch_dependencies(deprepo)
@@ -259,9 +268,9 @@ def get_default_or_fallback_revision(repo_name):
     print("Default revision: %s" % default_revision)
     print("Checking branch info")
 
-    githubreq = urllib.request.Request("https://api.github.com/repos/AfterLife-Devices/" + repo_name + "/branches")
+    githubreq = urllib.request.Request("https://api.github.com/repos/AfterlifeOS/" + repo_name + "/branches")
     add_auth(githubreq)
-    result = json.loads(urllib.request.urlopen(githubreq).read().decode())
+    result = json.loads(urllib.request.urlopen(githubreq, timeout=5).read().decode())
     if has_branch(result, default_revision):
         return default_revision
 
@@ -310,4 +319,4 @@ else:
             print("Done")
             sys.exit()
 
-print("Repository for %s not found in the AfterLife-Devices Github repository list. If this is in error, you may need to manually add it to your local_manifests/roomservice.xml." % device)
+print("Repository for %s not found in the AfterlifeOS Github repository list. If this is in error, you may need to manually add it to your local_manifests/roomservice.xml." % device)

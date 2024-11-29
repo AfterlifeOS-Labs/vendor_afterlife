@@ -1,35 +1,53 @@
-# LawnIcons
-ifeq ($(TARGET_PREBUILTS_LAWNICONS),true)
-    $(call inherit-product-if-exists, vendor/prebuilts/LawnIcons/config.mk)
+ifneq ($(TARGET_DISABLE_EPPE),true)
+# Require all requested packages to exist
+$(call enforce-product-packages-exist-internal,$(wildcard device/*/$(AFTERLIFE_BUILD)/$(TARGET_PRODUCT).mk),product_manifest.xml rild Calendar Launcher3 Launcher3Go Launcher3QuickStep Launcher3QuickStepGo android.hidl.memory@1.0-impl.vendor vndk_apex_snapshot_package)
 endif
 
-# AfterEcho
-ifeq ($(TARGET_USE_ECHO),true)
-    $(call inherit-product-if-exists, vendor/dolby/afterlife/afterlife.mk)
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.dolby.enabled=1
-else
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.dolby.enabled=0
-endif
-
-# BtHelper
+# Build Manifest
 PRODUCT_PACKAGES += \
-    BtHelper
+    build-manifest
+
+# Afterlife packages
+PRODUCT_PACKAGES += \
+    Eleven \
+    Etar \
+    ExactCalculator \
+    Glimpse \
+    Jelly \
+    LatinIME \
+    Profiles \
+    Recorder
+
+ifeq ($(PRODUCT_TYPE), go)
+PRODUCT_PACKAGES += \
+    AfterHomeQuickStepGo
+
+PRODUCT_DEXPREOPT_SPEED_APPS += \
+    AfterHomeQuickStepGo
+else
+PRODUCT_PACKAGES += \
+    AfterHomeQuickStep
+
+PRODUCT_DEXPREOPT_SPEED_APPS += \
+    AfterHomeQuickStep
+endif
+
+ifneq ($(PRODUCT_NO_CAMERA),true)
+PRODUCT_PACKAGES += \
+    Aperture
+endif
+
+ifneq ($(TARGET_EXCLUDES_AUDIOFX),true)
+PRODUCT_PACKAGES += \
+    AudioFX
+endif
 
 # Config
 PRODUCT_PACKAGES += \
-    SimpleDeviceConfig
+    SimpleDeviceConfig \
+    SimpleSettingsConfig
 
-# ExactCalculator
-PRODUCT_PACKAGES += \
-    ExactCalculator
-
-# Etar
-PRODUCT_PACKAGES += \
-    Etar
-
-# Extra tools in AfterLife
+# Extra tools in Lineage
 PRODUCT_PACKAGES += \
     bash \
     curl \
@@ -39,41 +57,43 @@ PRODUCT_PACKAGES += \
     setcap \
     vim
 
-# Faceunlock
-ifeq ($(TARGET_FACE_UNLOCK_SUPPORTED),true)
 PRODUCT_PACKAGES += \
-    ParanoidSense
+    nano_recovery
 
-PRODUCT_SYSTEM_EXT_PROPERTIES += \
-    ro.face.sense_service=true
+# Openssh
+PRODUCT_PACKAGES += \
+    scp \
+    sftp \
+    ssh \
+    sshd \
+    sshd_config \
+    ssh-keygen \
+    start-ssh
 
 PRODUCT_COPY_FILES += \
-    frameworks/native/data/etc/android.hardware.biometrics.face.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/android.hardware.biometrics.face.xml
+    vendor/afterlife/prebuilt/common/etc/init/init.openssh.rc:$(TARGET_COPY_OUT_PRODUCT)/etc/init/init.openssh.rc
+
+# rsync
+PRODUCT_PACKAGES += \
+    rsync
+
+# Root
+PRODUCT_PACKAGES += \
+    adb_root
+ifneq ($(TARGET_BUILD_VARIANT),user)
+ifeq ($(WITH_SU),true)
+PRODUCT_PACKAGES += \
+    su
+
+PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST += \
+    system/xbin/su
+endif
 endif
 
-# GameSpace
-PRODUCT_PACKAGES += \
-    GameSpace
+# SystemUI
+PRODUCT_DEXPREOPT_SPEED_APPS += \
+    SystemUI
 
-#Omni
 PRODUCT_PACKAGES += \
-    OmniJaws \
-    OmniStyle
-
-# Overlay
-PRODUCT_PACKAGES += \
-    CustomFontPixelLauncherOverlay \
     DocumentsUIOverlay \
     NetworkStackOverlay
-
-# PocketMode
-PRODUCT_PACKAGES += \
-    PocketMode
-
-PRODUCT_COPY_FILES += \
-    vendor/afterlife/pocket/privapp-permissions-pocketmode.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/privapp-permissions-pocketmode.xml
-
-# Protobuf - Workaround for prebuilt Qualcomm HAL
-PRODUCT_PACKAGES += \
-    libprotobuf-cpp-full-3.9.1-vendorcompat \
-    libprotobuf-cpp-lite-3.9.1-vendorcompat

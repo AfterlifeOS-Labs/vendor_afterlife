@@ -1,32 +1,5 @@
-# Inherit common mobile AfterLife stuff
+# Inherit common mobile Afterlife stuff
 $(call inherit-product, vendor/afterlife/config/common.mk)
-
-# Include AfterLife audio files
-include vendor/afterlife/config/afterlife_audio.mk
-
-# Sounds (default)
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.config.ringtone=Cartel.ogg \
-    ro.config.notification_sound=no-pro.ogg \
-    ro.config.alarm_alert=frenzy.ogg
-
-# Apps
-PRODUCT_PACKAGES += \
-    ExactCalculator
-
-ifeq ($(PRODUCT_TYPE), go)
-PRODUCT_PACKAGES += \
-    AfterHomeQuickStepGo
-
-PRODUCT_DEXPREOPT_SPEED_APPS += \
-    AfterHomeQuickStepGo
-else
-PRODUCT_PACKAGES += \
-    AfterHomeQuickStep
-
-PRODUCT_DEXPREOPT_SPEED_APPS += \
-    AfterHomeQuickStep
-endif
 
 # Charger
 PRODUCT_PACKAGES += \
@@ -37,6 +10,11 @@ PRODUCT_PACKAGES += \
     lineage_charger_animation \
     lineage_charger_animation_vendor
 endif
+
+# Customizations
+PRODUCT_PACKAGES += \
+    NavigationBarNoHint \
+    NavigationBarMode2ButtonOverlay
 
 # Media
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
@@ -50,8 +28,3 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     ThemePicker \
     ThemesStub
-
-# Customizations
-PRODUCT_PACKAGES += \
-    NavigationBarMode2ButtonOverlay \
-    NavigationBarNoHintOverlay

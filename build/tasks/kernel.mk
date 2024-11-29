@@ -1,5 +1,5 @@
 # Copyright (C) 2012 The CyanogenMod Project
-#           (C) 2017-2023 The LineageOS Project
+#           (C) 2017-2024 The LineageOS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@
 #   BOARD_KERNEL_IMAGE_NAME            = Built image name
 #                                          for ARM use: zImage
 #                                          for ARM64 use: Image.gz
+#                                          for x86 use: bzImage
 #                                          for uncompressed use: Image
 #                                          If using an appended DT, append '-dtb'
 #                                          to the end of the image name.
@@ -43,6 +44,8 @@
 #   BOARD_DTB_CFG                      = Path to a mkdtboimg config file for dtb.img
 #
 #   BOARD_DTBO_CFG                     = Path to a mkdtboimg config file
+#
+#   BOARD_CUSTOM_DTBIMG_MK             = Path to a custom dtbimage makefile
 #
 #   BOARD_CUSTOM_DTBOIMG_MK            = Path to a custom dtboimage makefile
 #
@@ -169,7 +172,7 @@ else
         $(error "NO KERNEL CONFIG")
     else
         ifneq ($(TARGET_FORCE_PREBUILT_KERNEL),)
-            ifneq ($(filter RELEASE NIGHTLY SNAPSHOT EXPERIMENTAL,$(LINEAGE_BUILDTYPE)),)
+            ifneq ($(filter RELEASE NIGHTLY SNAPSHOT EXPERIMENTAL,$(AFTERLIFE_BUILDTYPE)),)
                 $(error "PREBUILT KERNEL IS NOT ALLOWED ON OFFICIAL BUILDS!")
             else
                 $(warning **********************************************************)
@@ -359,6 +362,7 @@ endef
 # $(4): staging dir
 # $(5): module load list
 # $(6): suffix for output dir, needed for GKI modules usecase, empty otherwise
+# $(7): partition image intermediates file list
 # Depmod requires a well-formed kernel version so 0.0 is used as a placeholder.
 define build-image-kernel-modules-afterlife
     mkdir -p $(2)/lib/modules$(6)
@@ -379,6 +383,17 @@ define build-image-kernel-modules-afterlife
             echo "ERROR: $$NAME.ko was not found in the kernel modules intermediates dir, module load list must be corrected" 1>&2 && exit 1; \
         fi; \
     done
+    if [ ! -z "$(7)" ]; then \
+        echo lib/modules$(6)/modules.alias >> "$(7)"; \
+        echo lib/modules$(6)/modules.dep >> "$(7)"; \
+        if [ ! -z "$(5)" ]; then echo lib/modules$(6)/modules.load >> "$(7)"; fi; \
+        echo lib/modules$(6)/modules.softdep >> "$(7)"; \
+        for MODULE in $(1); do \
+            BASENAME=$$(basename $$MODULE); \
+            echo lib/modules$(6)/"$$BASENAME" >> "$(7)"; \
+        done; \
+        sort -u "$(7)" -o "$(7)"; \
+    fi;
 endef
 
 endif # FULL_RECOVERY_KERNEL_BUILD or FULL_KERNEL_BUILD
@@ -403,17 +418,24 @@ else ifeq ($(BOARD_USES_VENDOR_DLKMIMAGE),true)
 KERNEL_MODULES_OUT := $(TARGET_OUT_VENDOR_DLKM)
 KERNEL_DEPMOD_STAGING_DIR := $(KERNEL_BUILD_OUT_PREFIX)$(call intermediates-dir-for,PACKAGING,depmod_vendor)
 KERNEL_MODULE_MOUNTPOINT := vendor_dlkm
+KERNEL_MODULES_PARTITION_FILE_LIST := $(vendor_dlkmimage_intermediates)/file_list.txt
 $(INSTALLED_VENDOR_DLKMIMAGE_TARGET): $(TARGET_PREBUILT_INT_KERNEL)
 else
 KERNEL_MODULES_OUT := $(TARGET_OUT_VENDOR)
 KERNEL_DEPMOD_STAGING_DIR := $(KERNEL_BUILD_OUT_PREFIX)$(call intermediates-dir-for,PACKAGING,depmod_vendor)
 KERNEL_MODULE_MOUNTPOINT := vendor
+ifneq ($(BUILDING_VENDOR_IMAGE),)
+KERNEL_MODULES_PARTITION_FILE_LIST := $(vendorimage_intermediates)/file_list.txt
+else # No vendor partition
+KERNEL_MODULES_PARTITION_FILE_LIST := $(systemimage_intermediates)/file_list.txt
+endif # BUILDING_VENDOR_IMAGE
 $(INSTALLED_VENDORIMAGE_TARGET): $(TARGET_PREBUILT_INT_KERNEL)
 endif
 ifeq ($(BOARD_USES_SYSTEM_DLKMIMAGE),true)
 SYSTEM_KERNEL_MODULES_OUT := $(TARGET_OUT_SYSTEM_DLKM)
 SYSTEM_KERNEL_DEPMOD_STAGING_DIR := $(KERNEL_BUILD_OUT_PREFIX)$(call intermediates-dir-for,PACKAGING,depmod_system_dlkm)
 SYSTEM_KERNEL_MODULE_MOUNTPOINT := system_dlkm
+SYSTEM_KERNEL_MODULES_PARTITION_FILE_LIST := $(system_dlkmimage_intermediates)/file_list.txt
 $(INSTALLED_SYSTEM_DLKMIMAGE_TARGET): $(TARGET_PREBUILT_INT_KERNEL)
 endif
 MODULES_INTERMEDIATES := $(KERNEL_BUILD_OUT_PREFIX)$(call intermediates-dir-for,PACKAGING,kernel_modules)
@@ -455,10 +477,10 @@ $(KERNEL_CONFIG): $(KERNEL_OUT) $(ALL_KERNEL_DEFCONFIG_SRCS)
 	@echo "Building Kernel Config"
 	$(call make-kernel-config,$(KERNEL_OUT),$(KERNEL_DEFCONFIG))
 
-$(TARGET_PREBUILT_INT_KERNEL): $(KERNEL_CONFIG) $(DEPMOD) $(DTC)
+$(TARGET_PREBUILT_INT_KERNEL): $(KERNEL_CONFIG) $(DEPMOD) $(DTC) $(KERNEL_MODULES_PARTITION_FILE_LIST) $(SYSTEM_KERNEL_MODULES_PARTITION_FILE_LIST)
 	@echo "Building Kernel Image ($(BOARD_KERNEL_IMAGE_NAME))"
 	$(call make-kernel-target,$(BOARD_KERNEL_IMAGE_NAME))
-	$(hide) if grep -q '^CONFIG_OF=y' $(KERNEL_CONFIG); then \
+	$(hide) if [ -d "$(KERNEL_SRC)/arch/$(KERNEL_ARCH)/boot/dts/" ]; then \
 			echo "Building DTBs"; \
 			$(call make-kernel-target,dtbs); \
 		fi
@@ -480,6 +502,13 @@ $(TARGET_PREBUILT_INT_KERNEL): $(KERNEL_CONFIG) $(DEPMOD) $(DTC)
 			$(foreach s, $(TARGET_MODULE_ALIASES),\
 				$(eval p := $(subst :,$(space),$(s))) \
 				; mv $$(find $$kernel_modules_dir -name $(word 1,$(p))) $$kernel_modules_dir/$(word 2,$(p))); \
+			dup_modules=$$(find $$kernel_modules_dir -type f -name '*.ko' -printf '%f\n' |sort |uniq -d); \
+			$(if $$dup_modules,\
+				err=$$(for m in $$dup_modules; do \
+					echo "ERROR: Duplicate module $$m" 1>&2 && echo "dup"; \
+				done); \
+				[ -n "$$err" ] && exit 1; \
+			) \
 			all_modules=$$(find $$kernel_modules_dir -type f -name '*.ko'); \
 			filtered_modules=""; \
 			$(if $(SYSTEM_KERNEL_MODULES),\
@@ -488,14 +517,14 @@ $(TARGET_PREBUILT_INT_KERNEL): $(KERNEL_CONFIG) $(DEPMOD) $(DTC)
 					if [ -n "$$p" ]; then echo $$p; else echo "ERROR: $$m from SYSTEM_KERNEL_MODULES was not found" 1>&2 && exit 1; fi; \
 				done); \
 				[ $$? -ne 0 ] && exit 1; \
-				($(call build-image-kernel-modules-afterlife,$$gki_modules,$(SYSTEM_KERNEL_MODULES_OUT),$(SYSTEM_KERNEL_MODULE_MOUNTPOINT)/,$(SYSTEM_KERNEL_DEPMOD_STAGING_DIR),$(BOARD_SYSTEM_KERNEL_MODULES_LOAD),/$(GKI_SUFFIX))) || exit "$$?"; \
+				($(call build-image-kernel-modules-afterlife,$$gki_modules,$(SYSTEM_KERNEL_MODULES_OUT),$(SYSTEM_KERNEL_MODULE_MOUNTPOINT)/,$(SYSTEM_KERNEL_DEPMOD_STAGING_DIR),$(BOARD_SYSTEM_KERNEL_MODULES_LOAD),/$(GKI_SUFFIX),$(SYSTEM_KERNEL_MODULES_PARTITION_FILE_LIST))) || exit "$$?"; \
 				filtered_modules=$$(for n in $$all_modules; do \
 					module_name=$$(basename $$n); \
 					if [[ ! "$(SYSTEM_KERNEL_MODULES)" =~ "$$module_name" ]]; then echo $$n; fi; \
 				done); \
-				($(call build-image-kernel-modules-afterlife,$$filtered_modules,$(KERNEL_MODULES_OUT),$(KERNEL_MODULE_MOUNTPOINT)/,$(KERNEL_DEPMOD_STAGING_DIR),$(BOARD_VENDOR_KERNEL_MODULES_LOAD),/)) || exit "$$?"; \
+				($(call build-image-kernel-modules-afterlife,$$filtered_modules,$(KERNEL_MODULES_OUT),$(KERNEL_MODULE_MOUNTPOINT)/,$(KERNEL_DEPMOD_STAGING_DIR),$(BOARD_VENDOR_KERNEL_MODULES_LOAD),,$(KERNEL_MODULES_PARTITION_FILE_LIST))) || exit "$$?"; \
 				,\
-				($(call build-image-kernel-modules-afterlife,$$all_modules,$(KERNEL_MODULES_OUT),$(KERNEL_MODULE_MOUNTPOINT)/,$(KERNEL_DEPMOD_STAGING_DIR),$(BOARD_VENDOR_KERNEL_MODULES_LOAD),/)) || exit "$$?"; \
+				($(call build-image-kernel-modules-afterlife,$$all_modules,$(KERNEL_MODULES_OUT),$(KERNEL_MODULE_MOUNTPOINT)/,$(KERNEL_DEPMOD_STAGING_DIR),$(BOARD_VENDOR_KERNEL_MODULES_LOAD),,$(KERNEL_MODULES_PARTITION_FILE_LIST))) || exit "$$?"; \
 			) \
 			$(if $(BOOT_KERNEL_MODULES),\
 				vendor_boot_modules=$$(for m in $(BOOT_KERNEL_MODULES); do \
@@ -503,7 +532,7 @@ $(TARGET_PREBUILT_INT_KERNEL): $(KERNEL_CONFIG) $(DEPMOD) $(DTC)
 					if [ -n "$$p" ]; then echo $$p; else echo "ERROR: $$m from BOOT_KERNEL_MODULES was not found" 1>&2 && exit 1; fi; \
 				done); \
 				[ $$? -ne 0 ] && exit 1; \
-				($(call build-image-kernel-modules-afterlife,$$vendor_boot_modules,$(KERNEL_VENDOR_RAMDISK_MODULES_OUT),/,$(KERNEL_VENDOR_RAMDISK_DEPMOD_STAGING_DIR),$(KERNEL_VENDOR_RAMDISK_KERNEL_MODULES_LOAD),/)) || exit "$$?"; \
+				($(call build-image-kernel-modules-afterlife,$$vendor_boot_modules,$(KERNEL_VENDOR_RAMDISK_MODULES_OUT),,$(KERNEL_VENDOR_RAMDISK_DEPMOD_STAGING_DIR),$(KERNEL_VENDOR_RAMDISK_KERNEL_MODULES_LOAD),,)) || exit "$$?"; \
 			) \
 			$(if $(RECOVERY_KERNEL_MODULES),\
 				recovery_modules=$$(for m in $(RECOVERY_KERNEL_MODULES); do \
@@ -511,7 +540,7 @@ $(TARGET_PREBUILT_INT_KERNEL): $(KERNEL_CONFIG) $(DEPMOD) $(DTC)
 					if [ -n "$$p" ]; then echo $$p; else echo "ERROR: $$m from RECOVERY_KERNEL_MODULES was not found" 1>&2 && exit 1; fi; \
 				done); \
 				[ $$? -ne 0 ] && exit 1; \
-				($(call build-image-kernel-modules-afterlife,$$recovery_modules,$(KERNEL_RECOVERY_MODULES_OUT),/,$(KERNEL_RECOVERY_DEPMOD_STAGING_DIR),$(BOARD_RECOVERY_RAMDISK_KERNEL_MODULES_LOAD),/)) || exit "$$?"; \
+				($(call build-image-kernel-modules-afterlife,$$recovery_modules,$(KERNEL_RECOVERY_MODULES_OUT),,$(KERNEL_RECOVERY_DEPMOD_STAGING_DIR),$(BOARD_RECOVERY_RAMDISK_KERNEL_MODULES_LOAD),,)) || exit "$$?"; \
 			) \
 		fi
 
@@ -519,7 +548,7 @@ $(TARGET_PREBUILT_INT_KERNEL): $(KERNEL_CONFIG) $(DEPMOD) $(DTC)
 kerneltags: $(KERNEL_CONFIG)
 	$(call make-kernel-target,tags)
 
-.PHONY: kernelsavedefconfig alldefconfig
+.PHONY: kernelsavedefconfig alldefconfig kernelconfig recoverykernelconfig
 
 kernelsavedefconfig: $(KERNEL_OUT)
 	$(call make-kernel-config,$(KERNEL_OUT),$(BASE_KERNEL_DEFCONFIG))
@@ -529,6 +558,14 @@ kernelsavedefconfig: $(KERNEL_OUT)
 alldefconfig: $(KERNEL_OUT)
 	env KCONFIG_NOTIMESTAMP=true \
 		 $(call make-kernel-target,alldefconfig)
+
+kernelconfig: $(KERNEL_OUT) $(ALL_KERNEL_DEFCONFIG_SRCS)
+	@echo "Building Kernel Config"
+	$(call make-kernel-config,$(KERNEL_OUT),$(KERNEL_DEFCONFIG))
+
+recoverykernelconfig: $(KERNEL_OUT) $(ALL_RECOVERY_KERNEL_DEFCONFIG_SRCS)
+	@echo "Building Recovery Kernel Config"
+	$(call make-kernel-config,$(RECOVERY_KERNEL_OUT),$(RECOVERY_DEFCONFIG))
 
 ifeq (true,$(filter true, $(TARGET_NEEDS_DTBOIMAGE) $(BOARD_KERNEL_SEPARATED_DTBO)))
 ifneq ($(BOARD_CUSTOM_DTBOIMG_MK),)
@@ -604,7 +641,7 @@ else
 ifeq ($(BOARD_USES_QCOM_MERGE_DTBS_SCRIPT),true)
 	$(hide) find $(DTBS_BASE) -type f -name "*.dtb*" | xargs rm -f
 	$(hide) find $(DTBS_OUT) -type f -name "*.dtb*" | xargs rm -f
-	mv $(DTB_OUT)/arch/$(KERNEL_ARCH)/boot/dts/vendor/qcom/*.dtb $(DTB_OUT)/arch/$(KERNEL_ARCH)/boot/dts/vendor/*/*.dtbo $(DTBS_BASE)/
+	mv $(DTB_OUT)/arch/$(KERNEL_ARCH)/boot/dts/vendor/*/*.dtb $(DTB_OUT)/arch/$(KERNEL_ARCH)/boot/dts/vendor/*/*.dtbo $(DTBS_BASE)/
 	PATH=$(abspath $(HOST_OUT_EXECUTABLES)):$${PATH} python3 $(BUILD_TOP)/vendor/afterlife/build/tools/merge_dtbs.py $(DTBS_BASE) $(DTB_OUT)/arch/$(KERNEL_ARCH)/boot/dts/vendor/qcom $(DTBS_OUT)
 	cat $(shell find $(DTB_OUT)/out -type f -name "${TARGET_MERGE_DTBS_WILDCARD}.dtb" | sort) > $@
 else

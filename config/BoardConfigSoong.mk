@@ -13,7 +13,7 @@ EXPORT_TO_SOONG := \
 
 # Setup SOONG_CONFIG_* vars to export the vars listed above.
 # Documentation here:
-# https://github.com/AfterLifeProject/build_soong/commit/8328367c44085b948c003116c0ed74a047237a69
+# https://github.com/AfterlifeOS/android_build_soong/commit/8328367c44085b948c003116c0ed74a047237a69
 
 SOONG_CONFIG_NAMESPACES += afterlifeVarsPlugin
 
@@ -32,12 +32,8 @@ SOONG_CONFIG_afterlifeGlobalVars += \
     additional_gralloc_10_usage_bits \
     bootloader_message_offset \
     camera_override_format_from_reserved \
-    camera_needs_client_info_lib \
     gralloc_handle_has_custom_content_md_reserved_size \
-    disable_bluetooth_le_read_buffer_size_v2 \
-    disable_bluetooth_le_set_host_feature \
     gralloc_handle_has_reserved_size \
-    sdmcore_has_is_display_hw_available_func \
     gralloc_handle_has_ubwcp_format \
     target_health_charging_control_charging_path \
     target_health_charging_control_charging_enabled \
@@ -47,23 +43,16 @@ SOONG_CONFIG_afterlifeGlobalVars += \
     target_health_charging_control_supports_deadline \
     target_health_charging_control_supports_toggle \
     target_init_vendor_lib \
-    target_inputdispatcher_skip_event_key \
     target_ld_shim_libs \
     target_power_libperfmgr_mode_extension_lib \
+    target_powershare_path \
+    target_powershare_enabled \
+    target_powershare_disabled \
     target_surfaceflinger_udfps_lib \
     target_trust_usb_control_path \
     target_trust_usb_control_enable \
     target_trust_usb_control_disable \
-    uses_egl_display_array \
-    uses_legacy_fd_fbdev \
-    uses_oplus_camera \
-    needs_camera_boottime \
-    target_camera_package_name \
-    camera_needs_client_info \
-    uses_nothing_camera \
-    uses_miui_camera \
-    uses_oppo_camera \
-    include_miui_camera
+    uses_egl_display_array
 
 SOONG_CONFIG_NAMESPACES += afterlifeNvidiaVars
 SOONG_CONFIG_afterlifeNvidiaVars += \
@@ -71,7 +60,6 @@ SOONG_CONFIG_afterlifeNvidiaVars += \
 
 SOONG_CONFIG_NAMESPACES += afterlifeQcomVars
 SOONG_CONFIG_afterlifeQcomVars += \
-    no_fm_firmware \
     qti_vibrator_effect_lib \
     qti_vibrator_use_effect_stream \
     supports_extended_compress_format \
@@ -85,31 +73,17 @@ endif
 
 # Soong bool variables
 SOONG_CONFIG_afterlifeGlobalVars_camera_override_format_from_reserved := $(TARGET_CAMERA_OVERRIDE_FORMAT_FROM_RESERVED)
-SOONG_CONFIG_afterlifeGlobalVars_camera_needs_client_info := $(TARGET_CAMERA_NEEDS_CLIENT_INFO)
-SOONG_CONFIG_afterlifeGlobalVars_camera_needs_client_info_lib := $(TARGET_CAMERA_NEEDS_CLIENT_INFO_LIB)
-SOONG_CONFIG_afterlifeGlobalVars_camera_needs_client_info_lib_oplus := $(TARGET_CAMERA_NEEDS_CLIENT_INFO_LIB_OPLUS)
 SOONG_CONFIG_afterlifeGlobalVars_gralloc_handle_has_custom_content_md_reserved_size := $(TARGET_GRALLOC_HANDLE_HAS_CUSTOM_CONTENT_MD_RESERVED_SIZE)
 SOONG_CONFIG_afterlifeGlobalVars_gralloc_handle_has_reserved_size := $(TARGET_GRALLOC_HANDLE_HAS_RESERVED_SIZE)
 SOONG_CONFIG_afterlifeGlobalVars_gralloc_handle_has_ubwcp_format := $(TARGET_GRALLOC_HANDLE_HAS_UBWCP_FORMAT)
-SOONG_CONFIG_afterlifeGlobalVars_include_miui_camera := $(TARGET_INCLUDES_MIUI_CAMERA)
-SOONG_CONFIG_afterlifeGlobalVars_needs_camera_boottime := $(TARGET_CAMERA_BOOTTIME_TIMESTAMP)
 SOONG_CONFIG_afterlifeGlobalVars_uses_egl_display_array := $(TARGET_USES_EGL_DISPLAY_ARRAY)
 SOONG_CONFIG_afterlifeNvidiaVars_uses_nvidia_enhancements := $(NV_ANDROID_FRAMEWORK_ENHANCEMENTS)
-SOONG_CONFIG_afterlifeQcomVars_no_fm_firmware := $(TARGET_QCOM_NO_FM_FIRMWARE)
 SOONG_CONFIG_afterlifeQcomVars_qti_vibrator_use_effect_stream := $(TARGET_QTI_VIBRATOR_USE_EFFECT_STREAM)
 SOONG_CONFIG_afterlifeQcomVars_supports_extended_compress_format := $(AUDIO_FEATURE_ENABLED_EXTENDED_COMPRESS_FORMAT)
 SOONG_CONFIG_afterlifeQcomVars_uses_pre_uplink_features_netmgrd := $(TARGET_USES_PRE_UPLINK_FEATURES_NETMGRD)
-SOONG_CONFIG_afterlifeGlobalVars_uses_legacy_fd_fbdev := $(TARGET_USES_LEGACY_FD_FBDEV)
-SOONG_CONFIG_afterlifeGlobalVars_uses_miui_camera := $(TARGET_USES_MIUI_CAMERA)
-SOONG_CONFIG_afterlifeGlobalVars_uses_nothing_camera := $(TARGET_USES_NOTHING_CAMERA)
-SOONG_CONFIG_afterlifeGlobalVars_uses_oplus_camera := $(TARGET_USES_OPLUS_CAMERA)
-SOONG_CONFIG_afterlifeGlobalVars_uses_oppo_camera := $(TARGET_USES_OPPO_CAMERA)
-SOONG_CONFIG_afterlifeGlobalVars_sdmcore_has_is_display_hw_available_func := $(TARGET_SDMCORE_HAS_IS_DISPLAY_HW_AVAILABLE_FUNC)
-SOONG_CONFIG_afterlifeGlobalVars_target_camera_package_name := $(TARGET_CAMERA_PACKAGE_NAME)
 
 # Set default values
 BOOTLOADER_MESSAGE_OFFSET ?= 0
-TARGET_INPUTDISPATCHER_SKIP_EVENT_KEY ?= 0
 TARGET_ADDITIONAL_GRALLOC_10_USAGE_BITS ?= 0
 TARGET_CAMERA_OVERRIDE_FORMAT_FROM_RESERVED ?= false
 TARGET_GRALLOC_HANDLE_HAS_CUSTOM_CONTENT_MD_RESERVED_SIZE ?= false
@@ -122,8 +96,9 @@ TARGET_HEALTH_CHARGING_CONTROL_SUPPORTS_DEADLINE ?= false
 TARGET_HEALTH_CHARGING_CONTROL_SUPPORTS_TOGGLE ?= true
 TARGET_INIT_VENDOR_LIB ?= vendor_init
 TARGET_POWER_LIBPERFMGR_MODE_EXTENSION_LIB ?= libperfmgr-ext
+TARGET_POWERSHARE_ENABLED ?= 1
+TARGET_POWERSHARE_DISABLED ?= 0
 TARGET_QTI_VIBRATOR_EFFECT_LIB ?= libqtivibratoreffect
-TARGET_SDMCORE_HAS_IS_DISPLAY_HW_AVAILABLE_FUNC ?= true
 TARGET_SURFACEFLINGER_UDFPS_LIB ?= surfaceflinger_udfps_lib
 TARGET_TRUST_USB_CONTROL_PATH ?= /proc/sys/kernel/deny_new_usb
 TARGET_TRUST_USB_CONTROL_ENABLE ?= 1
@@ -141,34 +116,18 @@ SOONG_CONFIG_afterlifeGlobalVars_target_health_charging_control_supports_bypass 
 SOONG_CONFIG_afterlifeGlobalVars_target_health_charging_control_supports_deadline := $(TARGET_HEALTH_CHARGING_CONTROL_SUPPORTS_DEADLINE)
 SOONG_CONFIG_afterlifeGlobalVars_target_health_charging_control_supports_toggle := $(TARGET_HEALTH_CHARGING_CONTROL_SUPPORTS_TOGGLE)
 SOONG_CONFIG_afterlifeGlobalVars_target_init_vendor_lib := $(TARGET_INIT_VENDOR_LIB)
-SOONG_CONFIG_afterlifeGlobalVars_target_inputdispatcher_skip_event_key := $(TARGET_INPUTDISPATCHER_SKIP_EVENT_KEY)
 SOONG_CONFIG_afterlifeGlobalVars_target_ld_shim_libs := $(subst $(space),:,$(TARGET_LD_SHIM_LIBS))
 SOONG_CONFIG_afterlifeGlobalVars_target_power_libperfmgr_mode_extension_lib := $(TARGET_POWER_LIBPERFMGR_MODE_EXTENSION_LIB)
+SOONG_CONFIG_afterlifeGlobalVars_target_powershare_path := $(TARGET_POWERSHARE_PATH)
+SOONG_CONFIG_afterlifeGlobalVars_target_powershare_enabled := $(TARGET_POWERSHARE_ENABLED)
+SOONG_CONFIG_afterlifeGlobalVars_target_powershare_disabled := $(TARGET_POWERSHARE_DISABLED)
 SOONG_CONFIG_afterlifeGlobalVars_target_surfaceflinger_udfps_lib := $(TARGET_SURFACEFLINGER_UDFPS_LIB)
 SOONG_CONFIG_afterlifeGlobalVars_target_trust_usb_control_path := $(TARGET_TRUST_USB_CONTROL_PATH)
 SOONG_CONFIG_afterlifeGlobalVars_target_trust_usb_control_enable := $(TARGET_TRUST_USB_CONTROL_ENABLE)
 SOONG_CONFIG_afterlifeGlobalVars_target_trust_usb_control_disable := $(TARGET_TRUST_USB_CONTROL_DISABLE)
-SOONG_CONFIG_afterlifeGlobalVars_disable_bluetooth_le_read_buffer_size_v2 := $(TARGET_DISABLE_BLUETOOTH_LE_READ_BUFFER_SIZE_V2)
-SOONG_CONFIG_afterlifeGlobalVars_disable_bluetooth_le_set_host_feature := $(TARGET_DISABLE_BLUETOOTH_LE_SET_HOST_FEATURE)
-
 ifneq ($(filter $(QSSI_SUPPORTED_PLATFORMS),$(TARGET_BOARD_PLATFORM)),)
 SOONG_CONFIG_afterlifeQcomVars_qcom_display_headers_namespace := vendor/qcom/opensource/commonsys-intf/display
 else
 SOONG_CONFIG_afterlifeQcomVars_qcom_display_headers_namespace := $(QCOM_SOONG_NAMESPACE)/display
 endif
 SOONG_CONFIG_afterlifeQcomVars_qti_vibrator_effect_lib := $(TARGET_QTI_VIBRATOR_EFFECT_LIB)
-
-# libfmjni
-ifeq ($(BOARD_HAVE_QCOM_FM),true)
-    PRODUCT_SOONG_NAMESPACES += \
-        vendor/qcom/opensource/libfmjni
-else ifeq ($(BOARD_HAVE_BCM_FM),true)
-    PRODUCT_SOONG_NAMESPACES += \
-        hardware/broadcom/fm
-else ifeq ($(BOARD_HAVE_SLSI_FM),true)
-    PRODUCT_SOONG_NAMESPACES += \
-        hardware/samsung_slsi/fm
-else ifneq ($(BOARD_HAVE_MTK_FM),true)
-    PRODUCT_SOONG_NAMESPACES += \
-        packages/apps/FMRadio/jni/fmr
-endif

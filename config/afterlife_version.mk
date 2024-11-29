@@ -1,0 +1,37 @@
+PRODUCT_VERSION_MAJOR = 8
+PRODUCT_VERSION_MINOR = 0
+
+ifeq ($(AFTERLIFE_VERSION_APPEND_TIME_OF_DAY),true)
+    AFTERLIFE_BUILD_DATE := $(shell date -u +%Y%m%d_%H%M%S)
+else
+    AFTERLIFE_BUILD_DATE := $(shell date -u +%Y%m%d)
+endif
+
+ifndef AFTERLIFE_GAPPS
+    AFTERLIFE_ZIP_TYPE := Vanilla
+else
+    $(call inherit-product-if-exists, vendor/gms/gms.mk)
+
+    ifdef GAPPS_CORE
+        AFTERLIFE_ZIP_TYPE := CoreGApps
+    else ifdef GAPPS_BASIC
+        AFTERLIFE_ZIP_TYPE : BasicGApps
+    else
+        AFTERLIFE_ZIP_TYPE := GApps
+    endif
+endif
+
+# Versioning
+AFTERLIFE_CODENAME := Happiness
+AFTERLIFE_VERSION_EXTRA := VanillaIceCream
+
+AFTERLIFE_VERSION_SUFFIX := $(AFTERLIFE_BUILD_TYPE)_$(AFTERLIFE_BUILD_DATE)
+
+# Internal version
+AFTERLIFE_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR)_$(AFTERLIFE_CODENAME)-$(AFTERLIFE_VERSION_SUFFIX)-$(AFTERLIFE_ZIP_TYPE)
+
+# Display version
+AFTERLIFE_DISPLAY_VERSION := $(PRODUCT_VERSION_MAJOR)-$(AFTERLIFE_VERSION_SUFFIX)
+
+# Codename version
+AFTERLIFE_DISPLAY_VERSION_CODENAME := 15.1 | $(AFTERLIFE_CODENAME)
