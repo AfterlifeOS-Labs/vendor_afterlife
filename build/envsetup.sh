@@ -25,7 +25,7 @@ function goafterlife()
 {
     breakfast $*
     if [ $? -eq 0 ]; then
-        mka bacon
+        mka afterlife
     else
         echo "No such item in goafterlife menu. Try 'breakfast'"
         return 1
