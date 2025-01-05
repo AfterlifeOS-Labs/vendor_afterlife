@@ -16,8 +16,7 @@ PRODUCT_PACKAGES += \
     Jelly \
     LatinIME \
     Profiles \
-    Recorder \
-    Twelve
+    Recorder
 
 ifeq ($(PRODUCT_TYPE), go)
 PRODUCT_PACKAGES += \
