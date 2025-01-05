@@ -159,8 +159,8 @@ CUSTOM_LOCALES += \
 PRODUCT_EXTRA_RECOVERY_KEYS += \
     vendor/afterlife/build/target/product/security/afterlife
 
-include vendor/afterlife/config/afterlife_version.mk
 include vendor/afterlife/config/afterlife_signed.mk
+include vendor/afterlife/config/afterlife_version.mk
 include vendor/afterlife/config/afterlife_bootanimation.mk
 include vendor/afterlife/config/afterlife_packages.mk
 include vendor/afterlife/config/afterlife_audio.mk
