@@ -23,10 +23,10 @@ else
     $(warning "afterlife: No maintainer name detected, building as unofficial build.")
 endif
 
-ifeq ($(AFTERLIFE_BUILD_TYPE), OFFICIAL)
-PRODUCT_PACKAGES += \
-    Updater
+#ifeq ($(AFTERLIFE_BUILD_TYPE), OFFICIAL)
+#PRODUCT_PACKAGES += \
+#    Updater
 
-PRODUCT_COPY_FILES += \
-    vendor/afterlife/prebuilt/common/etc/init/init.afterlife-updater.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.afterlife-updater.rc
-endif
+#PRODUCT_COPY_FILES += \
+#    vendor/afterlife/prebuilt/common/etc/init/init.afterlife-updater.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.afterlife-updater.rc
+#endif
