@@ -90,3 +90,7 @@ PRODUCT_DEXPREOPT_SPEED_APPS += \
 PRODUCT_PACKAGES += \
     DocumentsUIOverlay \
     NetworkStackOverlay
+
+# TouchGestures
+PRODUCT_PACKAGES += \
+    TouchGestures
