@@ -155,6 +155,7 @@ gralloc_10_usage_bits {
 
 soong_config_module_type {
 <<<<<<< HEAD
+<<<<<<< HEAD
     name: "gralloc_handle_custom_content_md_reserved_size",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
@@ -271,6 +272,8 @@ soong_config_module_type {
 >>>>>>> a238c7ba (config: Move surfaceflinger UDFPS lib to select())
 =======
 >>>>>>> 0a6d68ce (config: Move libperfmgr mode extension lib to select())
+=======
+>>>>>>> 34d26b16 (config: Move vendor_init lib to select())
     name: "trust_usb_control",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
