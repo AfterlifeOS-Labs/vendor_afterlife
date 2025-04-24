@@ -157,6 +157,7 @@ soong_config_module_type {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     name: "gralloc_handle_custom_content_md_reserved_size",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
@@ -325,6 +326,8 @@ bootloader_message_offset {
 }
 
 soong_config_module_type {
+=======
+>>>>>>> ae97fe00 (config: Move bootloader message offset to select())
     name: "target_camera_package_name",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
