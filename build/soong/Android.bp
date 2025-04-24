@@ -333,6 +333,7 @@ target_camera_package_name {
 }
 
 soong_config_module_type {
+<<<<<<< HEAD
     name: "health_charging_control",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
@@ -382,6 +383,8 @@ health_charging_control {
 }
 
 soong_config_module_type {
+=======
+>>>>>>> a988fd35 (config: Move Lineage Health HAL to select())
     name: "powershare",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
