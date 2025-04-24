@@ -334,6 +334,7 @@ target_camera_package_name {
 
 soong_config_module_type {
 <<<<<<< HEAD
+<<<<<<< HEAD
     name: "health_charging_control",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
@@ -412,6 +413,8 @@ powershare {
 }
 
 soong_config_module_type {
+=======
+>>>>>>> 84eac4d9 (config: Move Lineage PowerShare HAL to select())
     name: "libcameraservice_ext_lib",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
