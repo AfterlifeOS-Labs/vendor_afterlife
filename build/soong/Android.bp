@@ -121,6 +121,7 @@ camera_needs_client_info_lib_oplus {
 
 soong_config_module_type {
 <<<<<<< HEAD
+<<<<<<< HEAD
     name: "camera_override_format_from_reserved",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
@@ -331,6 +332,8 @@ bootloader_message_offset {
 soong_config_module_type {
 =======
 >>>>>>> ae97fe00 (config: Move bootloader message offset to select())
+=======
+>>>>>>> 5c4ae0c1 (config: Move additional gralloc 10 usage bits to select())
     name: "target_camera_package_name",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
