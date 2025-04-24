@@ -225,6 +225,7 @@ vendor_init {
 }
 
 soong_config_module_type {
+<<<<<<< HEAD
     name: "power_libperfmgr",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
@@ -268,6 +269,8 @@ surfaceflinger_udfps_lib {
 soong_config_module_type {
 =======
 >>>>>>> a238c7ba (config: Move surfaceflinger UDFPS lib to select())
+=======
+>>>>>>> 0a6d68ce (config: Move libperfmgr mode extension lib to select())
     name: "trust_usb_control",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
