@@ -120,6 +120,7 @@ camera_needs_client_info_lib_oplus {
 }
 
 soong_config_module_type {
+<<<<<<< HEAD
     name: "camera_override_format_from_reserved",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
@@ -137,6 +138,8 @@ camera_override_format_from_reserved {
 }
 
 soong_config_module_type {
+=======
+>>>>>>> a51a8746 (config: Move camera override format from reserved to select())
     name: "gralloc_10_usage_bits",
     module_type: "cc_defaults",
     config_namespace: "afterlifeGlobalVars",
