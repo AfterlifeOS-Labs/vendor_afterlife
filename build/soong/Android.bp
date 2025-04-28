@@ -349,6 +349,7 @@ target_camera_package_name {
         },
     },
 }
+<<<<<<< HEAD
 
 soong_config_module_type {
 <<<<<<< HEAD
@@ -452,3 +453,5 @@ libcameraservice_ext_lib {
         },
     },
 }
+=======
+>>>>>>> cac9f6cd (config: Move libcameraservice extension lib to select())
