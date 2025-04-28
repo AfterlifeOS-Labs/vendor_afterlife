@@ -118,6 +118,7 @@ camera_needs_client_info_lib_oplus {
         },
     },
 }
+<<<<<<< HEAD
 
 soong_config_module_type {
 <<<<<<< HEAD
@@ -455,3 +456,5 @@ libcameraservice_ext_lib {
 }
 =======
 >>>>>>> cac9f6cd (config: Move libcameraservice extension lib to select())
+=======
+>>>>>>> b29c770f (config: Move camera package name flag to select())
