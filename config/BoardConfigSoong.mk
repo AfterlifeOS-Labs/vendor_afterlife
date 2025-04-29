@@ -82,6 +82,7 @@ SOONG_CONFIG_afterlifeGlobalVars_needs_camera_boottime := $(TARGET_CAMERA_BOOTTI
 SOONG_CONFIG_afterlifeGlobalVars_target_camera_package_name := $(TARGET_CAMERA_PACKAGE_NAME)
 SOONG_CONFIG_afterlifeGlobalVars_camera_needs_client_info := $(TARGET_CAMERA_NEEDS_CLIENT_INFO)
 SOONG_CONFIG_afterlifeGlobalVars_uses_nothing_camera := $(TARGET_USES_NOTHING_CAMERA)
+SOONG_CONFIG_afterlifeGlobalVars_camera_needs_client_info_lib_oplus := $(TARGET_CAMERA_NEEDS_CLIENT_INFO_LIB_OPLUS)
 
 # Lineage Health HAL
 ifneq ($(TARGET_HEALTH_CHARGING_CONTROL_CHARGING_PATH),)
