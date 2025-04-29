@@ -31,6 +31,7 @@ SOONG_CONFIG_afterlifeGlobalVars += \
     additional_gralloc_10_usage_bits \
     bootloader_message_offset \
     camera_override_format_from_reserved \
+    camera_needs_client_info_lib \
     disable_bluetooth_le_read_buffer_size_v2 \
     disable_bluetooth_le_set_host_feature \
     target_init_vendor_lib \
@@ -61,6 +62,7 @@ TARGET_TRUST_USB_CONTROL_DISABLE ?= 0
 # Soong value variables
 SOONG_CONFIG_afterlifeGlobalVars_additional_gralloc_10_usage_bits := $(TARGET_ADDITIONAL_GRALLOC_10_USAGE_BITS)
 SOONG_CONFIG_afterlifeGlobalVars_bootloader_message_offset := $(BOOTLOADER_MESSAGE_OFFSET)
+SOONG_CONFIG_afterlifeGlobalVars_camera_needs_client_info_lib := $(TARGET_CAMERA_NEEDS_CLIENT_INFO_LIB)
 SOONG_CONFIG_afterlifeGlobalVars_target_init_vendor_lib := $(TARGET_INIT_VENDOR_LIB)
 SOONG_CONFIG_afterlifeGlobalVars_target_inputdispatcher_skip_event_key := $(TARGET_INPUTDISPATCHER_SKIP_EVENT_KEY)
 SOONG_CONFIG_afterlifeGlobalVars_target_power_libperfmgr_mode_extension_lib := $(TARGET_POWER_LIBPERFMGR_MODE_EXTENSION_LIB)
