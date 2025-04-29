@@ -44,7 +44,8 @@ SOONG_CONFIG_afterlifeGlobalVars += \
     uses_legacy_fd_fbdev \
     uses_oplus_camera \
     needs_camera_boottime \
-    target_camera_package_name
+    target_camera_package_name \
+    camera_needs_client_info
 
 # Soong bool variables
 SOONG_CONFIG_afterlifeGlobalVars_camera_override_format_from_reserved := $(TARGET_CAMERA_OVERRIDE_FORMAT_FROM_RESERVED)
@@ -78,6 +79,7 @@ SOONG_CONFIG_afterlifeGlobalVars_uses_oplus_camera := $(TARGET_USES_OPLUS_CAMERA
 SOONG_CONFIG_afterlifeGlobalVars_sdmcore_has_is_display_hw_available_func := $(TARGET_SDMCORE_HAS_IS_DISPLAY_HW_AVAILABLE_FUNC)
 SOONG_CONFIG_afterlifeGlobalVars_needs_camera_boottime := $(TARGET_CAMERA_BOOTTIME_TIMESTAMP)
 SOONG_CONFIG_afterlifeGlobalVars_target_camera_package_name := $(TARGET_CAMERA_PACKAGE_NAME)
+SOONG_CONFIG_afterlifeGlobalVars_camera_needs_client_info := $(TARGET_CAMERA_NEEDS_CLIENT_INFO)
 
 # Lineage Health HAL
 ifneq ($(TARGET_HEALTH_CHARGING_CONTROL_CHARGING_PATH),)
