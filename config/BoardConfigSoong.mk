@@ -48,7 +48,8 @@ SOONG_CONFIG_afterlifeGlobalVars += \
     camera_needs_client_info \
     uses_nothing_camera \
     uses_miui_camera \
-    uses_oppo_camera
+    uses_oppo_camera \
+    include_miui_camera
 
 # Soong bool variables
 SOONG_CONFIG_afterlifeGlobalVars_camera_override_format_from_reserved := $(TARGET_CAMERA_OVERRIDE_FORMAT_FROM_RESERVED)
@@ -87,6 +88,7 @@ SOONG_CONFIG_afterlifeGlobalVars_uses_nothing_camera := $(TARGET_USES_NOTHING_CA
 SOONG_CONFIG_afterlifeGlobalVars_camera_needs_client_info_lib_oplus := $(TARGET_CAMERA_NEEDS_CLIENT_INFO_LIB_OPLUS)
 SOONG_CONFIG_afterlifeGlobalVars_uses_miui_camera := $(TARGET_USES_MIUI_CAMERA)
 SOONG_CONFIG_afterlifeGlobalVars_uses_oppo_camera := $(TARGET_USES_OPPO_CAMERA)
+SOONG_CONFIG_afterlifeGlobalVars_include_miui_camera := $(TARGET_INCLUDES_MIUI_CAMERA)
 
 # Lineage Health HAL
 ifneq ($(TARGET_HEALTH_CHARGING_CONTROL_CHARGING_PATH),)
