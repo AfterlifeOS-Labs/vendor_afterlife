@@ -31,6 +31,8 @@ SOONG_CONFIG_afterlifeGlobalVars += \
     additional_gralloc_10_usage_bits \
     bootloader_message_offset \
     camera_override_format_from_reserved \
+    disable_bluetooth_le_read_buffer_size_v2 \
+    disable_bluetooth_le_set_host_feature \
     target_init_vendor_lib \
     target_power_libperfmgr_mode_extension_lib \
     target_trust_usb_control_path \
@@ -58,6 +60,8 @@ SOONG_CONFIG_afterlifeGlobalVars_target_power_libperfmgr_mode_extension_lib := $
 SOONG_CONFIG_afterlifeGlobalVars_target_trust_usb_control_path := $(TARGET_TRUST_USB_CONTROL_PATH)
 SOONG_CONFIG_afterlifeGlobalVars_target_trust_usb_control_enable := $(TARGET_TRUST_USB_CONTROL_ENABLE)
 SOONG_CONFIG_afterlifeGlobalVars_target_trust_usb_control_disable := $(TARGET_TRUST_USB_CONTROL_DISABLE)
+SOONG_CONFIG_afterlifeGlobalVars_disable_bluetooth_le_read_buffer_size_v2 := $(TARGET_DISABLE_BLUETOOTH_LE_READ_BUFFER_SIZE_V2)
+SOONG_CONFIG_afterlifeGlobalVars_disable_bluetooth_le_set_host_feature := $(TARGET_DISABLE_BLUETOOTH_LE_SET_HOST_FEATURE)
 
 # Lineage Health HAL
 ifneq ($(TARGET_HEALTH_CHARGING_CONTROL_CHARGING_PATH),)
