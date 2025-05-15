@@ -12,3 +12,7 @@ endif
 PRODUCT_PACKAGES += \
     unrar \
     zstd
+
+# Include Afterlife LatinIME dictionaries
+PRODUCT_PACKAGE_OVERLAYS += vendor/afterlife/overlay/dictionaries
+PRODUCT_ENFORCE_RRO_EXCLUDED_OVERLAYS += vendor/afterlife/overlay/dictionaries

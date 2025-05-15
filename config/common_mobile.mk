@@ -3,7 +3,8 @@ $(call inherit-product, vendor/afterlife/config/common.mk)
 
 # Apps
 PRODUCT_PACKAGES += \
-    AvatarPicker
+    AvatarPicker \
+    LatinIME
 
 # Media
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
