@@ -22,6 +22,22 @@ function check_product()
     # hide successful answers, but allow the errors to show
 }
 
+function goafterlife() {
+    if [ -z "$1" ]; then
+        echo "Usage: goafterlife <device_codename>"
+        return 1
+    fi
+
+    breakfast "$1"
+    if [ $? -eq 0 ]; then
+        mka afterlife
+    else
+        echo "Failed to lunch device: $1"
+        return 1
+    fi
+}
+
+
 function brunch()
 {
     breakfast $*

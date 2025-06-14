@@ -1,5 +1,5 @@
 # Copyright (C) 2017 Unlegacy-Android
-# Copyright (C) 2017,2020 The LineageOS Project
+# Copyright (C) 2023 The AfterLife Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,16 +14,20 @@
 # limitations under the License.
 
 # -----------------------------------------------------------------
-# Afterlife OTA update package
+# AfterLife OTA update package
 
-AFTERLIFE_TARGET_PACKAGE := $(PRODUCT_OUT)/$(AFTERLIFE_VERSION).zip
+AFTERLIFE_ZIP_NAME := afterlife_$(TARGET_DEVICE)-$(shell echo $(AFTERLIFE_VERSION) | tr '[:upper:]' '[:lower:]').zip
+AFTERLIFE_TARGET_PACKAGE := $(PRODUCT_OUT)/$(AFTERLIFE_ZIP_NAME)
 
 SHA256 := prebuilts/build-tools/path/$(HOST_PREBUILT_TAG)/sha256sum
 
-$(AFTERLIFE_TARGET_PACKAGE): $(INTERNAL_OTA_PACKAGE_TARGET)
-	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(AFTERLIFE_TARGET_PACKAGE)
-	$(hide) $(SHA256) $(AFTERLIFE_TARGET_PACKAGE) | sed "s|$(PRODUCT_OUT)/||" > $(AFTERLIFE_TARGET_PACKAGE).sha256sum
-	@echo "Package Complete: $(AFTERLIFE_TARGET_PACKAGE)" >&2
-
 .PHONY: afterlife
-afterlife: $(AFTERLIFE_TARGET_PACKAGE) $(DEFAULT_GOAL)
+afterlife: $(DEFAULT_GOAL) $(INTERNAL_OTA_PACKAGE_TARGET)
+	$(hide) mv -f $(INTERNAL_OTA_PACKAGE_TARGET) $(AFTERLIFE_TARGET_PACKAGE)
+	$(hide) $(SHA256) $(AFTERLIFE_TARGET_PACKAGE) | sed "s|$(PRODUCT_OUT)/||" > $(AFTERLIFE_TARGET_PACKAGE).sha256sum
+	@echo
+	@echo -e "\t ===============================-Package complete-========================================="
+	@echo -e "\t Zip: $(AFTERLIFE_TARGET_PACKAGE)"
+	@echo -e "\t Size: `du -sh $(AFTERLIFE_TARGET_PACKAGE) | awk '{print $$1}'`"
+	@echo -e "\t Afterlife | #NeverDie"
+	@echo -e "\t =========================================================================================="
