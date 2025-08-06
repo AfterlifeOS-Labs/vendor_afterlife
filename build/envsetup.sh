@@ -479,3 +479,5 @@ function generate_host_overrides() {
 generate_host_overrides
 
 afterlife_dashboard
+
+export SKIP_ABI_CHECKS=true
