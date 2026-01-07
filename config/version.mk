@@ -1,45 +1,47 @@
-PRODUCT_VERSION_MAJOR = 23
-PRODUCT_VERSION_MINOR = 2
+PRODUCT_VERSION_MAJOR = 9
+PRODUCT_VERSION_MINOR = 0
 
-ifeq ($(LINEAGE_VERSION_APPEND_TIME_OF_DAY),true)
-    LINEAGE_BUILD_DATE := $(shell date -u +%Y%m%d_%H%M%S)
+# versioning
+AFTERLIFE_CODENAME := Resurrection
+AFTERLIFE_VERSION_EXTRA := Baklava
+
+ifeq ($(AFTERLIFE_VERSION_APPEND_TIME_OF_DAY),true)
+    AFTERLIFE_BUILD_DATE := $(shell date -u +%Y%m%d_%H%M%S)
 else
-    LINEAGE_BUILD_DATE := $(shell date -u +%Y%m%d)
+    AFTERLIFE_BUILD_DATE := $(shell date -u +%Y%m%d)
 endif
 
-# Set LINEAGE_BUILDTYPE from the env RELEASE_TYPE, for jenkins compat
-
-ifndef LINEAGE_BUILDTYPE
-    ifdef RELEASE_TYPE
-        # Starting with "LINEAGE_" is optional
-        RELEASE_TYPE := $(shell echo $(RELEASE_TYPE) | sed -e 's|^LINEAGE_||g')
-        LINEAGE_BUILDTYPE := $(RELEASE_TYPE)
-    endif
+ifndef AFTERLIFE_GAPPS
+    AFTERLIFE_GAPPS := false
 endif
 
-# Filter out random types, so it'll reset to UNOFFICIAL
-ifeq ($(filter RELEASE NIGHTLY SNAPSHOT EXPERIMENTAL,$(LINEAGE_BUILDTYPE)),)
-    LINEAGE_BUILDTYPE := UNOFFICIAL
-    LINEAGE_EXTRAVERSION :=
+ifeq ($(AFTERLIFE_GAPPS),true)
+    AFTERLIFE_ZIP_TYPE := GApps
+    WITH_GMS := true
+else
+    AFTERLIFE_ZIP_TYPE := Vanilla
 endif
 
-ifeq ($(LINEAGE_BUILDTYPE), UNOFFICIAL)
-    ifneq ($(TARGET_UNOFFICIAL_BUILD_ID),)
-        LINEAGE_EXTRAVERSION := -$(TARGET_UNOFFICIAL_BUILD_ID)
-    endif
+ifeq ($(WITH_GMS),true)
+    $(call inherit-product-if-exists, vendor/gms/products/gms.mk)
 endif
 
-LINEAGE_VERSION_SUFFIX := $(LINEAGE_BUILD_DATE)-$(LINEAGE_BUILDTYPE)$(LINEAGE_EXTRAVERSION)-$(LINEAGE_BUILD)
+AFTERLIFE_VERSION_SUFFIX := $(AFTERLIFE_BUILD_TYPE)_$(AFTERLIFE_BUILD_DATE)
 
 # Internal version
-LINEAGE_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR)-$(LINEAGE_VERSION_SUFFIX)
+AFTERLIFE_VERSION := $(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR)-$(AFTERLIFE_CODENAME)-$(AFTERLIFE_VERSION_SUFFIX)-$(AFTERLIFE_ZIP_TYPE)
 
 # Display version
-LINEAGE_DISPLAY_VERSION := $(PRODUCT_VERSION_MAJOR)-$(LINEAGE_VERSION_SUFFIX)
+AFTERLIFE_DISPLAY_VERSION := $(PRODUCT_VERSION_MAJOR)-$(AFTERLIFE_VERSION_SUFFIX)
 
-# LineageOS version properties
+# Codename version
+AFTERLIFE_DISPLAY_VERSION_CODENAME := 16.2 | $(AFTERLIFE_CODENAME)
+
+# AfterLife System Version
 PRODUCT_PRODUCT_PROPERTIES += \
-    ro.lineage.version=$(LINEAGE_VERSION) \
-    ro.lineage.display.version=$(LINEAGE_DISPLAY_VERSION) \
-    ro.lineage.build.version=$(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR) \
-    ro.lineage.releasetype=$(LINEAGE_BUILDTYPE)
+    ro.afterlife.version=$(AFTERLIFE_VERSION) \
+    ro.afterlife.releasetype=$(AFTERLIFE_BUILD_TYPE) \
+    ro.afterlife.releasevarient=$(AFTERLIFE_ZIP_TYPE) \
+    ro.afterlife.build.version=$(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR) \
+    ro.afterlife.version.codename=$(AFTERLIFE_CODENAME) \
+    ro.afterlife.version.extra=$(AFTERLIFE_VERSION_EXTRA)

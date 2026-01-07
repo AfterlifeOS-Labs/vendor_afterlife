@@ -6,13 +6,13 @@ prebuilt_etc_xml {
 }
 
 prebuilt_etc_xml {
-    name: "lineage-component-overrides.xml",
+    name: "afterlife-component-overrides.xml",
     product_specific: true,
-    src: "etc/lineage-component-overrides.xml",
+    src: "etc/afterlife-component-overrides.xml",
     sub_dir: "sysconfig",
 }
 
 prebuilt_addon_d {
-    name: "50-lineage.sh",
-    src: "bin/50-lineage.sh",
+    name: "50-afterlife.sh",
+    src: "bin/50-afterlife.sh",
 }
